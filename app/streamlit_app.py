@@ -28,13 +28,21 @@ if st.button("Run Agents"):
     with st.spinner("Agents talking..."):
 
         try:
-    result = asyncio.run(run_chat(turns))
+            result = asyncio.run(run_chat(turns))
 
-except Exception as e:
-    st.error(str(e))
-    st.exception(e)
+            st.subheader("Conversation")
 
-    st.subheader("Conversation")
+            for msg in result.messages:
+
+                if hasattr(msg, "source"):
+                    st.markdown(
+                        f"**{msg.source}**: "
+                        f"{msg.content}"
+                    )
+
+        except Exception as e:
+            st.error("Full error:")
+            st.exception(e)
 
     for msg in result.messages:
 
