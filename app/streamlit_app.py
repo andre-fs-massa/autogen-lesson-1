@@ -27,7 +27,12 @@ if st.button("Run Agents"):
 
     with st.spinner("Agents talking..."):
 
-        result = asyncio.run(run_chat(turns))
+        try:
+    result = asyncio.run(run_chat(turns))
+
+except Exception as e:
+    st.error(str(e))
+    st.exception(e)
 
     st.subheader("Conversation")
 
