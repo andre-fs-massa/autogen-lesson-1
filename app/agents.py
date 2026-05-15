@@ -9,7 +9,7 @@ from autogen_ext.models.openai import OpenAIChatCompletionClient
 load_dotenv()
 
 model_client = OpenAIChatCompletionClient(
-    model="gpt-4.1-mini",
+    model="gpt-4o-mini",
     api_key=os.getenv("OPENAI_API_KEY")
 )
 
