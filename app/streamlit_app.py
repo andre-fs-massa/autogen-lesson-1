@@ -35,11 +35,14 @@ with left:
         value="Joe and Cathy, create a stand-up comedy routine."
     )
 
-    turns = st.slider(
-        "Conversation rounds",
+    # ALTERAÇÃO:
+    # max turns real
+    max_turns = st.slider(
+        "Max turns",
         min_value=2,
-        max_value=6,
-        value=3
+        max_value=12,
+        value=4,
+        step=1
     )
 
     run_button = st.button(
@@ -59,15 +62,17 @@ with right:
                 result = asyncio.run(
                     run_chat(
                         topic=topic,
-                        turns=turns
+                        max_turns=max_turns
                     )
                 )
 
                 for msg in result.messages:
 
-                    # ALTERAÇÃO:
-                    # não mostrar prompt inicial
-                    if getattr(msg, "source", "") == "user":
+                    if getattr(
+                        msg,
+                        "source",
+                        ""
+                    ) == "user":
                         continue
 
                     if hasattr(msg, "source"):
@@ -80,7 +85,7 @@ with right:
                             )
 
             except Exception as e:
-                st.error("Full error:")
+                st.error(str(e))
                 st.exception(e)
 
 st.divider()

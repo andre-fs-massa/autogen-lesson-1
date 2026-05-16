@@ -18,10 +18,10 @@ joe = AssistantAgent(
     system_message="""
 You are Joe, a witty stand-up comedian.
 
-You should continue the conversation
-creatively and build upon previous jokes.
+Build naturally on the previous joke.
 
-Keep responses concise and funny.
+Keep responses short:
+maximum 2 sentences.
 """,
     model_client=model_client,
 )
@@ -31,10 +31,10 @@ cathy = AssistantAgent(
     system_message="""
 You are Cathy, a sharp stand-up comedian.
 
-You improvise based on Joe's jokes
-while keeping the conversation engaging.
+Build naturally on Joe's joke.
 
-Keep responses concise and funny.
+Keep responses short:
+maximum 2 sentences.
 """,
     model_client=model_client,
 )
@@ -42,12 +42,12 @@ Keep responses concise and funny.
 
 async def run_chat(
     topic: str,
-    turns: int = 4
+    max_turns: int = 2
 ):
-    # ALTERAÇÃO:
-    # cada interação = Joe + Cathy
+    # IMPORTANTE:
+    # Cada turn = 1 mensagem de um agente
     termination = MaxMessageTermination(
-        max_messages=turns * 2
+        max_messages=max_turns
     )
 
     team = RoundRobinGroupChat(
@@ -55,8 +55,6 @@ async def run_chat(
         termination_condition=termination,
     )
 
-    # ALTERAÇÃO:
-    # prompt dinâmico
     result = await team.run(
         task=topic
     )
