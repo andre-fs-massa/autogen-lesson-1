@@ -12,15 +12,15 @@ st.set_page_config(
 st.title("🎭 Multi-Agent Stand-Up Comedy")
 
 st.write(
-    "Lesson 1 — Multi-Agent Conversation "
+    "Multi-Agent Conversation "
     "using AutoGen"
 )
 
 turns = st.slider(
     "Number of interactions",
     min_value=2,
-    max_value=12,
-    value=6
+    max_value=6,
+    value=4
 )
 
 if st.button("Run Agents"):
