@@ -17,9 +17,8 @@ st.caption(
 )
 
 st.markdown("""
-This demo showcases autonomous interaction
-between multiple AI agents using Microsoft's
-AutoGen framework.
+This demo reproduces Lesson 1 from
+AI Agentic Design Patterns with AutoGen.
 """)
 
 st.divider()
@@ -32,18 +31,52 @@ with left:
 
     topic = st.text_area(
         "Conversation topic",
-        value="Joe and Cathy, create a stand-up comedy routine."
+        value=(
+            "Joe and Cathy, "
+            "create a stand-up comedy routine."
+        )
     )
 
-    # ALTERAÇÃO:
-    # max turns real
-    max_turns = st.slider(
-        "Max turns",
-        min_value=2,
-        max_value=12,
-        value=4,
-        step=1
+    # ==========================
+    # STOP METHOD
+    # ==========================
+    stop_method = st.radio(
+        "Conversation stop method",
+        [
+            "Max turns",
+            "Termination message"
+        ]
     )
+
+    # ==========================
+    # MAX TURNS
+    # ==========================
+    if stop_method == "Max turns":
+
+        max_turns = st.slider(
+            "Max turns",
+            min_value=1,
+            max_value=10,
+            value=2,
+            help="""
+Matches the course behavior.
+
+1 = Joe + Cathy
+
+2 = Joe + Cathy + Joe
+
+3 = Joe + Cathy + Joe + Cathy
+"""
+        )
+
+    else:
+        max_turns = None
+
+        st.info("""
+Conversation ends when one agent says:
+
+'I gotta go'
+""")
 
     run_button = st.button(
         "Run Agents",
@@ -59,15 +92,18 @@ with right:
         with st.spinner("Agents thinking..."):
 
             try:
+
                 result = asyncio.run(
                     run_chat(
                         topic=topic,
+                        stop_method=stop_method,
                         max_turns=max_turns
                     )
                 )
 
                 for msg in result.messages:
 
+                    # remove prompt inicial
                     if getattr(
                         msg,
                         "source",
@@ -95,15 +131,7 @@ st.markdown("""
 
 - Multi-agent orchestration
 - Agent-to-agent communication
+- Termination conditions
 - Autonomous conversations
 - LLM-powered collaboration
-- Production deployment
-""")
-
-st.markdown("""
-### Architecture
-
-User → Streamlit UI → AutoGen Team  
-→ Joe Agent ↔ Cathy Agent  
-→ OpenAI API
 """)

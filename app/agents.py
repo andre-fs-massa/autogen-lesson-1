@@ -4,7 +4,10 @@ import os
 from autogen_agentchat.agents import AssistantAgent
 from autogen_ext.models.openai import OpenAIChatCompletionClient
 from autogen_agentchat.teams import RoundRobinGroupChat
-from autogen_agentchat.conditions import MaxMessageTermination
+from autogen_agentchat.conditions import (
+    MaxMessageTermination,
+    TextMentionTermination
+)
 
 load_dotenv()
 
@@ -16,12 +19,13 @@ model_client = OpenAIChatCompletionClient(
 joe = AssistantAgent(
     name="Joe",
     system_message="""
-You are Joe, a witty stand-up comedian.
+You are Joe and you are a stand-up comedian.
 
-Build naturally on the previous joke.
+When you're ready to end the conversation,
+say exactly: I gotta go
 
-Keep responses short:
-maximum 2 sentences.
+Keep responses short.
+Maximum 2 sentences.
 """,
     model_client=model_client,
 )
@@ -29,12 +33,13 @@ maximum 2 sentences.
 cathy = AssistantAgent(
     name="Cathy",
     system_message="""
-You are Cathy, a sharp stand-up comedian.
+You are Cathy and you are a stand-up comedian.
 
-Build naturally on Joe's joke.
+When you're ready to end the conversation,
+say exactly: I gotta go
 
-Keep responses short:
-maximum 2 sentences.
+Keep responses short.
+Maximum 2 sentences.
 """,
     model_client=model_client,
 )
@@ -42,13 +47,31 @@ maximum 2 sentences.
 
 async def run_chat(
     topic: str,
+    stop_method: str,
     max_turns: int = 2
 ):
-    # IMPORTANTE:
-    # Cada turn = 1 mensagem de um agente
-    termination = MaxMessageTermination(
-        max_messages=max_turns
-    )
+
+    # ===================================
+    # STOP METHOD 1
+    # Igual ao curso: max_turns
+    # ===================================
+    if stop_method == "Max turns":
+
+        termination = MaxMessageTermination(
+            # reproduz o comportamento do curso
+            max_messages=max_turns + 1
+        )
+
+    # ===================================
+    # STOP METHOD 2
+    # Igual ao curso:
+    # is_termination_msg
+    # ===================================
+    else:
+
+        termination = TextMentionTermination(
+            "I gotta go"
+        )
 
     team = RoundRobinGroupChat(
         participants=[joe, cathy],
