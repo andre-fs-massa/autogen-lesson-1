@@ -16,33 +16,74 @@ model_client = OpenAIChatCompletionClient(
     api_key=os.getenv("OPENAI_API_KEY")
 )
 
-joe = AssistantAgent(
-    name="Joe",
-    system_message="""
+
+def create_agents(stop_method: str):
+
+    # ====================================
+    # CURSO: TERMINATION MESSAGE
+    # ====================================
+    if stop_method == "Termination message":
+
+        joe_system = """
 You are Joe and you are a stand-up comedian.
 
 When you're ready to end the conversation,
-say exactly: I gotta go
+say exactly:
+
+I gotta go
 
 Keep responses short.
 Maximum 2 sentences.
-""",
-    model_client=model_client,
-)
+"""
 
-cathy = AssistantAgent(
-    name="Cathy",
-    system_message="""
+        cathy_system = """
 You are Cathy and you are a stand-up comedian.
 
 When you're ready to end the conversation,
-say exactly: I gotta go
+say exactly:
+
+I gotta go
 
 Keep responses short.
 Maximum 2 sentences.
-""",
-    model_client=model_client,
-)
+"""
+
+    # ====================================
+    # CURSO: MAX TURNS
+    # ====================================
+    else:
+
+        joe_system = """
+You are Joe and you are a stand-up comedian.
+
+Keep the jokes rolling.
+
+Keep responses short.
+Maximum 2 sentences.
+"""
+
+        cathy_system = """
+You are Cathy and you are a stand-up comedian.
+
+Keep the jokes rolling.
+
+Keep responses short.
+Maximum 2 sentences.
+"""
+
+    joe = AssistantAgent(
+        name="Joe",
+        system_message=joe_system,
+        model_client=model_client,
+    )
+
+    cathy = AssistantAgent(
+        name="Cathy",
+        system_message=cathy_system,
+        model_client=model_client,
+    )
+
+    return joe, cathy
 
 
 async def run_chat(
@@ -51,22 +92,25 @@ async def run_chat(
     max_turns: int = 2
 ):
 
-    # ===================================
-    # STOP METHOD 1
-    # Igual ao curso: max_turns
-    # ===================================
+    joe, cathy = create_agents(
+        stop_method
+    )
+
+    # ====================================
+    # OPÇÃO 1
+    # IGUAL AO CURSO
+    # ====================================
     if stop_method == "Max turns":
 
         termination = MaxMessageTermination(
-            # reproduz o comportamento do curso
+            # replica max_turns do notebook
             max_messages=max_turns + 1
         )
 
-    # ===================================
-    # STOP METHOD 2
-    # Igual ao curso:
-    # is_termination_msg
-    # ===================================
+    # ====================================
+    # OPÇÃO 2
+    # IGUAL AO CURSO
+    # ====================================
     else:
 
         termination = TextMentionTermination(
