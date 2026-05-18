@@ -16,7 +16,7 @@ st.title(
 )
 
 st.caption(
-    "Conversation between 2 agents (Joe and Cathy), using AutoGen and OpenAI"
+    "Acting between 2 agents (Joe and Cathy), using AutoGen and OpenAI"
 )
 
 st.divider()
@@ -35,11 +35,11 @@ with left:
 
     # Fixed topics
     topic = st.selectbox(
-        "Conversation topic",
+        "Acting theme",
         [
             "Stand-up Comedy",
             "Artificial Intelligence",
-            "Engineering"
+            "Music"
         ]
     )
 
@@ -88,7 +88,7 @@ with right:
     if run_button:
 
         with st.spinner(
-            "Agents are thinking..."
+            "Agents are preparing..."
         ):
 
             try:

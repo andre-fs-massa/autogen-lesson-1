@@ -28,10 +28,10 @@ def create_agents(stop_method):
 
             system_message=(
                 "Your name is Joe. "
-                "You enjoy discussing topics with Cathy. "
-                "When you're ready to end the conversation, "
-                "say 'I gotta go'."
-                "Keep the conversation short."
+                "You enjoy acting on a theme with Cathy. "
+                "When you're ready to end the acting, "
+                "say 'I gotta go'. "
+                "Keep the acting short: max of 3 iterations."
             ),
 
             llm_config=llm_config,
@@ -47,10 +47,10 @@ def create_agents(stop_method):
 
             system_message=(
                 "Your name is Cathy. "
-                "You enjoy discussing topics with Joe. "
-                "When you're ready to end the conversation, "
-                "say 'I gotta go'."
-                "Keep the conversation short."
+                "You enjoy acting on a theme with Joe. "
+                "When you're ready to end the acting, "
+                "say 'I gotta go'. "
+                "Keep the acting short: max of 3 iterations."
             ),
 
             llm_config=llm_config,
@@ -72,7 +72,7 @@ def create_agents(stop_method):
 
             system_message=(
                 "Your name is Joe. "
-                "You enjoy discussing topics with Cathy."
+                "You enjoy acting with Cathy."
             ),
 
             llm_config=llm_config,
@@ -85,7 +85,7 @@ def create_agents(stop_method):
 
             system_message=(
                 "Your name is Cathy. "
-                "You enjoy discussing topics with Joe."
+                "You enjoy acting with Joe."
             ),
 
             llm_config=llm_config,
@@ -114,7 +114,7 @@ def run_chat(
 
         chat_result = joe.initiate_chat(
             recipient=cathy,
-            message="I'm Joe. Cathy, let's talk about this: " + topic,
+            message="I'm Joe. Cathy, let's act on this theme: " + topic + ".",
         )
 
     # =====================================
@@ -124,7 +124,7 @@ def run_chat(
 
         chat_result = joe.initiate_chat(
             recipient=cathy,
-            message="I'm Joe. Cathy, let's talk about this: " + topic,
+            message="I'm Joe. Cathy, let's act on this theme: " + topic + ".",
             max_turns=max_turns
         )
 
