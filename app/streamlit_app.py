@@ -16,7 +16,7 @@ st.title(
 )
 
 st.caption(
-    "Multi-agent conversation using AutoGen and OpenAI"
+    "Conversation between 2 agents (Joe and Cathy), using AutoGen and OpenAI"
 )
 
 st.divider()
@@ -38,8 +38,8 @@ with left:
         "Conversation topic",
         [
             "Stand-up Comedy",
-            "About AI",
-            "About Engineering"
+            "Artificial Intelligence",
+            "Engineering"
         ]
     )
 
@@ -88,7 +88,7 @@ with right:
     if run_button:
 
         with st.spinner(
-            "Agents are talking..."
+            "Agents are thinking..."
         ):
 
             try:

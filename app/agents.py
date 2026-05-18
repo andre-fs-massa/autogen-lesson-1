@@ -31,6 +31,7 @@ def create_agents(stop_method):
                 "You enjoy discussing topics with Cathy. "
                 "When you're ready to end the conversation, "
                 "say 'I gotta go'."
+                "Keep the conversation short."
             ),
 
             llm_config=llm_config,
@@ -49,6 +50,7 @@ def create_agents(stop_method):
                 "You enjoy discussing topics with Joe. "
                 "When you're ready to end the conversation, "
                 "say 'I gotta go'."
+                "Keep the conversation short."
             ),
 
             llm_config=llm_config,
@@ -112,7 +114,7 @@ def run_chat(
 
         chat_result = joe.initiate_chat(
             recipient=cathy,
-            message=topic,
+            message="I'm Joe. Cathy, let's talk about this: " + topic,
         )
 
     # =====================================
@@ -122,7 +124,7 @@ def run_chat(
 
         chat_result = joe.initiate_chat(
             recipient=cathy,
-            message=topic,
+            message="I'm Joe. Cathy, let's talk about this: " + topic,
             max_turns=max_turns
         )
 
