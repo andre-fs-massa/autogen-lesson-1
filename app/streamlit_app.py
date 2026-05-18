@@ -1,5 +1,4 @@
 import streamlit as st
-import asyncio
 
 from agents import run_chat
 
@@ -11,7 +10,7 @@ st.set_page_config(
 )
 
 
-# Title
+# Header
 st.title(
     "AI Agent Playground"
 )
@@ -23,10 +22,13 @@ st.caption(
 st.divider()
 
 
-# Left / Right layout
+# Layout
 left, right = st.columns([1, 2])
 
 
+# =====================================
+# LEFT SIDE
+# =====================================
 with left:
 
     st.subheader("Configuration")
@@ -50,7 +52,7 @@ with left:
         ]
     )
 
-    # Max turns only appears if selected
+    # Max turns UI
     if stop_method == "Max turns":
 
         max_turns = st.slider(
@@ -61,10 +63,12 @@ with left:
         )
 
     else:
-        max_turns = 4
+
+        max_turns = None
 
         st.info(
-            "Conversation ends when an agent says: 'I gotta go'"
+            "Conversation ends when an agent says: "
+            "'I gotta go'"
         )
 
     # Run button
@@ -74,6 +78,9 @@ with left:
     )
 
 
+# =====================================
+# RIGHT SIDE
+# =====================================
 with right:
 
     st.subheader("Conversation")
@@ -86,36 +93,35 @@ with right:
 
             try:
 
-                result = asyncio.run(
-                    run_chat(
-                        topic=topic,
-                        stop_method=stop_method,
-                        max_turns=max_turns
-                    )
+                result = run_chat(
+                    topic=topic,
+                    stop_method=stop_method,
+                    max_turns=max_turns
                 )
 
                 # Show messages
-                for msg in result.messages:
+                for msg in result.chat_history:
 
-                    # Skip initial task prompt
-                    if getattr(
-                        msg,
-                        "source",
-                        ""
-                    ) == "user":
+                    role = msg.get("name")
+
+                    # Skip system/user messages
+                    if role is None:
                         continue
 
                     with st.chat_message(
-                        msg.source
+                        role
                     ):
                         st.write(
-                            msg.content
+                            msg["content"]
                         )
 
             except Exception as e:
                 st.error(str(e))
 
 
+# =====================================
+# FOOTER
+# =====================================
 st.divider()
 
 st.markdown("""

@@ -1,97 +1,100 @@
 from dotenv import load_dotenv
 import os
 
-from autogen_agentchat.agents import AssistantAgent
-from autogen_ext.models.openai import OpenAIChatCompletionClient
-from autogen_agentchat.teams import RoundRobinGroupChat
-from autogen_agentchat.conditions import (
-    MaxMessageTermination,
-    TextMentionTermination
-)
+from autogen import ConversableAgent
 
-# Load environment variables (.env)
+
+# Load environment variables
 load_dotenv()
 
 
-# OpenAI model configuration
-model_client = OpenAIChatCompletionClient(
-    model="gpt-4o-mini",
-    api_key=os.getenv("OPENAI_API_KEY")
-)
+# OpenAI configuration
+llm_config = {
+    "model": "gpt-4o-mini",
+    "api_key": os.getenv("OPENAI_API_KEY")
+}
 
 
 def create_agents(stop_method):
 
-    # System prompt for termination message mode
+    # =====================================
+    # STOP METHOD:
+    # TERMINATION MESSAGE
+    # =====================================
     if stop_method == "Termination message":
 
-        joe_prompt = """
-You are Joe.
+        joe = ConversableAgent(
+            name="Joe",
 
-You enjoy discussing topics with Cathy.
+            system_message=(
+                "Your name is Joe. "
+                "You enjoy discussing topics with Cathy. "
+                "When you're ready to end the conversation, "
+                "say 'I gotta go'."
+            ),
 
-When you want to end the conversation,
-say exactly:
+            llm_config=llm_config,
 
-I gotta go
+            human_input_mode="NEVER",
 
-Keep responses short.
-Maximum 2 sentences.
-"""
+            is_termination_msg=lambda msg:
+                "I gotta go" in msg["content"],
+        )
 
-        cathy_prompt = """
-You are Cathy.
+        cathy = ConversableAgent(
+            name="Cathy",
 
-You enjoy discussing topics with Joe.
+            system_message=(
+                "Your name is Cathy. "
+                "You enjoy discussing topics with Joe. "
+                "When you're ready to end the conversation, "
+                "say 'I gotta go'."
+            ),
 
-When you want to end the conversation,
-say exactly:
+            llm_config=llm_config,
 
-I gotta go
+            human_input_mode="NEVER",
 
-Keep responses short.
-Maximum 2 sentences.
-"""
+            is_termination_msg=lambda msg:
+                "I gotta go" in msg["content"],
+        )
 
-    # System prompt for max turns mode
+    # =====================================
+    # STOP METHOD:
+    # MAX TURNS
+    # =====================================
     else:
 
-        joe_prompt = """
-You are Joe.
+        joe = ConversableAgent(
+            name="Joe",
 
-You enjoy discussing topics with Cathy.
+            system_message=(
+                "Your name is Joe. "
+                "You enjoy discussing topics with Cathy."
+            ),
 
-Keep responses short.
-Maximum 2 sentences.
-"""
+            llm_config=llm_config,
 
-        cathy_prompt = """
-You are Cathy.
+            human_input_mode="NEVER",
+        )
 
-You enjoy discussing topics with Joe.
+        cathy = ConversableAgent(
+            name="Cathy",
 
-Keep responses short.
-Maximum 2 sentences.
-"""
+            system_message=(
+                "Your name is Cathy. "
+                "You enjoy discussing topics with Joe."
+            ),
 
-    # Create Joe agent
-    joe = AssistantAgent(
-        name="Joe",
-        system_message=joe_prompt,
-        model_client=model_client,
-    )
+            llm_config=llm_config,
 
-    # Create Cathy agent
-    cathy = AssistantAgent(
-        name="Cathy",
-        system_message=cathy_prompt,
-        model_client=model_client,
-    )
+            human_input_mode="NEVER",
+        )
 
     return joe, cathy
 
 
-async def run_chat(
+def run_chat(
     topic,
     stop_method,
     max_turns
@@ -102,29 +105,25 @@ async def run_chat(
         stop_method
     )
 
-    # Stop method 1: Max turns
-    if stop_method == "Max turns":
+    # =====================================
+    # TERMINATION MESSAGE MODE
+    # =====================================
+    if stop_method == "Termination message":
 
-        termination = MaxMessageTermination(
-            max_messages=max_turns
+        chat_result = joe.initiate_chat(
+            recipient=cathy,
+            message=topic,
         )
 
-    # Stop method 2: Termination message
+    # =====================================
+    # MAX TURNS MODE
+    # =====================================
     else:
 
-        termination = TextMentionTermination(
-            "I gotta go"
+        chat_result = joe.initiate_chat(
+            recipient=cathy,
+            message=topic,
+            max_turns=max_turns
         )
 
-    # Create team
-    team = RoundRobinGroupChat(
-        participants=[joe, cathy],
-        termination_condition=termination,
-    )
-
-    # Start conversation
-    result = await team.run(
-        task=topic
-    )
-
-    return result
+    return chat_result
