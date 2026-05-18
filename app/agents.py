@@ -9,25 +9,28 @@ from autogen_agentchat.conditions import (
     TextMentionTermination
 )
 
+# Load environment variables (.env)
 load_dotenv()
 
+
+# OpenAI model configuration
 model_client = OpenAIChatCompletionClient(
     model="gpt-4o-mini",
     api_key=os.getenv("OPENAI_API_KEY")
 )
 
 
-def create_agents(stop_method: str):
+def create_agents(stop_method):
 
-    # ====================================
-    # CURSO: TERMINATION MESSAGE
-    # ====================================
+    # System prompt for termination message mode
     if stop_method == "Termination message":
 
-        joe_system = """
-You are Joe and you are a stand-up comedian.
+        joe_prompt = """
+You are Joe.
 
-When you're ready to end the conversation,
+You enjoy discussing topics with Cathy.
+
+When you want to end the conversation,
 say exactly:
 
 I gotta go
@@ -36,10 +39,12 @@ Keep responses short.
 Maximum 2 sentences.
 """
 
-        cathy_system = """
-You are Cathy and you are a stand-up comedian.
+        cathy_prompt = """
+You are Cathy.
 
-When you're ready to end the conversation,
+You enjoy discussing topics with Joe.
+
+When you want to end the conversation,
 say exactly:
 
 I gotta go
@@ -48,38 +53,38 @@ Keep responses short.
 Maximum 2 sentences.
 """
 
-    # ====================================
-    # CURSO: MAX TURNS
-    # ====================================
+    # System prompt for max turns mode
     else:
 
-        joe_system = """
-You are Joe and you are a stand-up comedian.
+        joe_prompt = """
+You are Joe.
 
-Keep the jokes rolling.
-
-Keep responses short.
-Maximum 2 sentences.
-"""
-
-        cathy_system = """
-You are Cathy and you are a stand-up comedian.
-
-Keep the jokes rolling.
+You enjoy discussing topics with Cathy.
 
 Keep responses short.
 Maximum 2 sentences.
 """
 
+        cathy_prompt = """
+You are Cathy.
+
+You enjoy discussing topics with Joe.
+
+Keep responses short.
+Maximum 2 sentences.
+"""
+
+    # Create Joe agent
     joe = AssistantAgent(
         name="Joe",
-        system_message=joe_system,
+        system_message=joe_prompt,
         model_client=model_client,
     )
 
+    # Create Cathy agent
     cathy = AssistantAgent(
         name="Cathy",
-        system_message=cathy_system,
+        system_message=cathy_prompt,
         model_client=model_client,
     )
 
@@ -87,41 +92,37 @@ Maximum 2 sentences.
 
 
 async def run_chat(
-    topic: str,
-    stop_method: str,
-    max_turns: int = 2
+    topic,
+    stop_method,
+    max_turns
 ):
 
+    # Create agents
     joe, cathy = create_agents(
         stop_method
     )
 
-    # ====================================
-    # OPÇÃO 1
-    # IGUAL AO CURSO
-    # ====================================
+    # Stop method 1: Max turns
     if stop_method == "Max turns":
 
         termination = MaxMessageTermination(
-            # replica max_turns do notebook
-            max_messages=max_turns + 1
+            max_messages=max_turns
         )
 
-    # ====================================
-    # OPÇÃO 2
-    # IGUAL AO CURSO
-    # ====================================
+    # Stop method 2: Termination message
     else:
 
         termination = TextMentionTermination(
             "I gotta go"
         )
 
+    # Create team
     team = RoundRobinGroupChat(
         participants=[joe, cathy],
         termination_condition=termination,
     )
 
+    # Start conversation
     result = await team.run(
         task=topic
     )
