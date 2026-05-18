@@ -72,7 +72,8 @@ def create_agents(stop_method):
 
             system_message=(
                 "Your name is Joe. "
-                "You enjoy acting with Cathy."
+                "You enjoy acting with Cathy. "
+                "Start the next action from the previous action."
             ),
 
             llm_config=llm_config,
